@@ -8,6 +8,8 @@ use App\Models\Lead;
 use App\Models\Listing;
 use App\Models\Review;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\ListingLeadReceived;
 use Tests\TestCase;
 
 class TravelDirectoryTest extends TestCase
@@ -54,6 +56,16 @@ class TravelDirectoryTest extends TestCase
         $responseFiltered = $this->get('/listings?destination=' . $listing->destination->slug);
         $responseFiltered->assertStatus(200);
         $responseFiltered->assertSee($listing->title);
+
+        $unclaimed = Listing::where('is_claimed', false)->first();
+        $claimed = Listing::where('is_claimed', true)->first();
+        $this->assertNotNull($unclaimed);
+        $this->assertNotNull($claimed);
+
+        $responseUnclaimed = $this->get('/listings?unclaimed=1');
+        $responseUnclaimed->assertStatus(200);
+        $responseUnclaimed->assertSee($unclaimed->title);
+        $responseUnclaimed->assertDontSee($claimed->title);
     }
 
     /**
@@ -69,7 +81,7 @@ class TravelDirectoryTest extends TestCase
         $response->assertStatus(200);
         $response->assertSee($listing->title);
         $response->assertSee('LodgingBusiness'); // Schema check
-        $response->assertSee('Verified Traveler Reviews');
+        $response->assertSee('Traveler Reviews');
     }
 
     /**
@@ -108,6 +120,8 @@ class TravelDirectoryTest extends TestCase
      */
     public function test_traveler_can_submit_direct_lead_inquiry(): void
     {
+        Mail::fake();
+
         $listing = Listing::first();
         $this->assertNotNull($listing);
 
@@ -129,6 +143,11 @@ class TravelDirectoryTest extends TestCase
             'listing_id' => $listing->id,
             'guest_email' => 'john@traveler.com',
         ]);
+
+        Mail::assertSent(ListingLeadReceived::class, function (ListingLeadReceived $mail) use ($listing): bool {
+            return $mail->hasTo($listing->email)
+                && $mail->hasReplyTo('john@traveler.com');
+        });
     }
 
     /**
@@ -167,7 +186,7 @@ class TravelDirectoryTest extends TestCase
         $listing = Listing::first();
         $this->assertNotNull($listing);
 
-        $initialCount = $listing->review_count;
+        $initialReviewCount = $listing->reviews()->count();
 
         $payload = [
             'author_name' => 'Elena Gilbert',
@@ -189,6 +208,10 @@ class TravelDirectoryTest extends TestCase
         ]);
 
         $listing->refresh();
-        $this->assertEquals($initialCount + 1, $listing->review_count);
+        $this->assertEquals($initialReviewCount + 1, $listing->review_count);
+        $this->assertEquals(
+            round((float) $listing->reviews()->avg('rating'), 2),
+            $listing->rating
+        );
     }
 }

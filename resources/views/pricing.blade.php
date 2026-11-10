@@ -4,15 +4,15 @@
 @section('meta_description', 'Claim your travel business listing, unlock verified host badges, and capture direct inquiries with zero commission fees.')
 
 @section('content')
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+<div class="mx-auto max-w-7xl px-4 py-12 sm:px-6 sm:py-16 lg:px-8">
 
     <!-- Header Section -->
     <div class="text-center max-w-3xl mx-auto mb-16">
-        <span class="inline-block px-3 py-1 rounded-full bg-indigo-50 border border-indigo-200 text-indigo-700 text-xs font-bold uppercase tracking-wider mb-4">
+        <span class="mb-4 inline-block rounded-full border border-[#183b32]/10 bg-white px-3 py-1 text-xs font-bold uppercase tracking-wider text-[#c76545]">
             For Boutique Hotels, Villas, Tour Operators & Restaurants
         </span>
-        <h1 class="text-4xl sm:text-5xl font-extrabold text-slate-900 tracking-tight leading-tight">
-            Stop Paying 20% OTA Fees. <br><span class="text-indigo-600">Own Your Direct Guest Relationships.</span>
+        <h1 class="font-serif text-4xl font-medium leading-tight tracking-tight text-[#183b32] sm:text-5xl">
+            Stop Paying 20% OTA Fees. <span class="text-[#c76545]">Own Your Direct Guest Relationships.</span>
         </h1>
         <p class="text-base sm:text-lg text-slate-600 mt-4 leading-relaxed">
             VoyageDirectory puts travelers directly in touch with you. When guests book through our platform, you keep 100% of the revenue.
@@ -22,9 +22,9 @@
     <!-- Pricing Cards Grid -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-stretch mb-20">
         @foreach($plans as $plan)
-            <div class="bg-white rounded-3xl border {{ $plan['highlight'] ? 'border-indigo-600 ring-2 ring-indigo-600/20 shadow-xl' : 'border-slate-200 shadow-sm' }} p-8 flex flex-col justify-between relative">
+            <div class="relative flex flex-col justify-between rounded-3xl border bg-[#fffdf8] p-7 shadow-sm sm:p-8 {{ $plan['highlight'] ? 'border-[#183b32] ring-2 ring-[#183b32]/15 shadow-xl' : 'border-[#e9e5dc]' }}">
                 @if($plan['highlight'])
-                    <div class="absolute -top-3.5 left-1/2 -translate-x-1/2 px-3.5 py-1 rounded-full bg-indigo-600 text-white text-[11px] font-bold uppercase tracking-wider shadow">
+                    <div class="absolute -top-3.5 left-1/2 -translate-x-1/2 rounded-full bg-[#183b32] px-3.5 py-1 text-[11px] font-bold uppercase tracking-wider text-white shadow">
                         {{ $plan['badge'] ?? 'Most Popular' }}
                     </div>
                 @endif
@@ -37,7 +37,7 @@
                     <!-- Price Display -->
                     <div class="mt-6 pb-6 border-b border-slate-100">
                         <div class="flex items-baseline gap-1">
-                            <span class="text-4xl font-extrabold text-slate-900">${{ $plan['price'] }}</span>
+                            <span class="font-serif text-4xl font-medium text-[#183b32]">${{ $plan['price'] }}</span>
                             <span class="text-xs font-medium text-slate-500">/ {{ $plan['cadence'] }}</span>
                         </div>
                         @if($plan['price'] > 0)
@@ -61,7 +61,7 @@
                 </div>
 
                 <div class="mt-8 pt-6 border-t border-slate-100">
-                    <a href="{{ $plan['cta_url'] }}" class="w-full block py-3 px-4 rounded-xl text-center text-xs font-bold transition-all {{ $plan['highlight'] ? 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-md' : 'bg-slate-100 hover:bg-slate-200 text-slate-900' }}">
+                    <a href="{{ $plan['cta_url'] }}" class="block w-full rounded-xl px-4 py-3 text-center text-xs font-bold transition {{ $plan['highlight'] ? 'bg-[#183b32] text-white shadow-md hover:bg-[#245447]' : 'bg-[#f0ede5] text-[#183b32] hover:bg-[#e7e2d7]' }}">
                         {{ $plan['cta'] }} &rarr;
                     </a>
                 </div>
@@ -70,7 +70,7 @@
     </div>
 
     <!-- Monetization & ROI Demonstration -->
-    <div class="bg-gradient-to-br from-slate-900 to-indigo-950 text-white rounded-3xl p-8 sm:p-12 mb-20 shadow-xl border border-indigo-900">
+    <div class="mb-20 rounded-3xl border border-[#183b32] bg-gradient-to-br from-[#183b32] to-[#142e28] p-8 text-white shadow-xl sm:p-12">
         <div class="max-w-3xl">
             <span class="text-xs font-bold uppercase tracking-wider text-teal-400">The Business Economics</span>
             <h2 class="text-2xl sm:text-3xl font-extrabold mt-1">Why Travel Businesses Love VoyageDirectory</h2>
@@ -80,15 +80,15 @@
 
             <div class="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-6 pt-6 border-t border-white/10 text-center">
                 <div class="p-4 rounded-2xl bg-white/5 border border-white/10">
-                    <div class="text-2xl font-extrabold text-teal-300">$0</div>
+                    <div class="text-2xl font-extrabold text-[#f3c6a9]">$0</div>
                     <div class="text-xs text-slate-400 mt-1">Commission per booking</div>
                 </div>
                 <div class="p-4 rounded-2xl bg-white/5 border border-white/10">
-                    <div class="text-2xl font-extrabold text-teal-300">100% Direct</div>
+                    <div class="text-2xl font-extrabold text-[#f3c6a9]">100% Direct</div>
                     <div class="text-xs text-slate-400 mt-1">Direct guest email & phone</div>
                 </div>
                 <div class="p-4 rounded-2xl bg-white/5 border border-white/10">
-                    <div class="text-2xl font-extrabold text-teal-300">Do-Follow</div>
+                    <div class="text-2xl font-extrabold text-[#f3c6a9]">Do-Follow</div>
                     <div class="text-xs text-slate-400 mt-1">SEO backlink to your website</div>
                 </div>
             </div>

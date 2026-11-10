@@ -4,23 +4,23 @@
 @section('meta_description', 'Find one-of-a-kind independent stays, locally led experiences, and memorable places around the world. Browse curated destinations and book directly.')
 
 @section('content')
-    <section class="overflow-hidden bg-[#f6f3ec] text-slate-900">
-        <div class="mx-auto grid max-w-7xl items-center gap-10 px-4 pb-10 pt-12 sm:px-6 sm:pt-16 lg:grid-cols-[1fr_0.95fr] lg:gap-16 lg:px-8 lg:pb-14 lg:pt-16">
+    <section class="bg-[#f6f3ec] text-slate-900">
+        <div class="mx-auto grid max-w-7xl items-center gap-7 px-4 pb-7 pt-8 sm:gap-10 sm:px-6 sm:pb-10 sm:pt-16 lg:grid-cols-[1fr_0.95fr] lg:gap-16 lg:px-8 lg:pb-14 lg:pt-16">
             <div class="relative z-10">
                 <div class="inline-flex items-center gap-2 rounded-full border border-emerald-900/10 bg-white/70 px-3.5 py-2 text-xs font-semibold text-emerald-950">
                     <span class="h-2 w-2 rounded-full bg-[#d36b48]"></span>
                     A MORE PERSONAL WAY TO TRAVEL
                 </div>
 
-                <h1 class="mt-6 max-w-xl font-serif text-5xl font-medium leading-[1.04] tracking-tight text-[#183b32] sm:text-6xl lg:text-7xl">
+                <h1 class="mt-4 max-w-xl font-serif text-4xl font-medium leading-[1.03] tracking-tight text-[#183b32] sm:mt-6 sm:text-6xl lg:text-7xl">
                     Find a place that feels <span class="italic text-[#c76545]">like nowhere else.</span>
                 </h1>
 
-                <p class="mt-6 max-w-lg text-base leading-7 text-slate-600 sm:text-lg">
+                <p class="mt-4 max-w-lg text-base leading-7 text-slate-600 sm:mt-6 sm:text-lg">
                     Independent stays, locally led experiences, and the little details that make a trip yours. Discover them here, then book direct.
                 </p>
 
-                <div class="mt-7 flex flex-wrap items-center gap-3">
+                <div class="mt-5 flex flex-wrap items-center gap-3 sm:mt-7">
                     <a href="{{ route('listings.index') }}" class="inline-flex items-center justify-center gap-2 rounded-full bg-[#183b32] px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-[#245447] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#183b32]">
                         Explore the collection
                         <span aria-hidden="true">&rarr;</span>
@@ -30,7 +30,7 @@
                     </a>
                 </div>
 
-                <div class="mt-8 flex items-center gap-3 text-sm text-slate-600">
+                <div class="mt-6 flex items-center gap-3 text-sm text-slate-600 sm:mt-8">
                     <div class="flex -space-x-2" aria-hidden="true">
                         <span class="flex h-8 w-8 items-center justify-center rounded-full border-2 border-[#f6f3ec] bg-[#d7e4dc] text-xs">✦</span>
                         <span class="flex h-8 w-8 items-center justify-center rounded-full border-2 border-[#f6f3ec] bg-[#f0d7c6] text-xs">✦</span>
@@ -40,7 +40,7 @@
                 </div>
             </div>
 
-            <div class="relative mx-auto w-full max-w-xl pb-8 pl-4 sm:pl-8">
+            <div class="relative mx-auto w-full max-w-xl pb-7 pl-4 sm:pb-8 sm:pl-8">
                 @if($featuredListings->isNotEmpty())
                     @foreach($featuredListings->take(1) as $heroListing)
                         <a href="{{ route('destinations.show', $heroListing->destination->slug) }}" class="group relative block aspect-[5/4] overflow-hidden rounded-[2rem] bg-[#d8d2c6] shadow-xl shadow-[#183b32]/15">
@@ -95,7 +95,7 @@
                 </div>
                 <div
                     class="relative z-20 border-t border-slate-100 px-3 py-2 sm:border-t-0 sm:border-l"
-                    x-data="{ open: false, value: '', label: 'Anywhere in the world' }"
+                    x-data="{ open: false, upward: false, value: '', label: 'Anywhere in the world' }"
                     @click.outside="open = false"
                     @keydown.escape.window="open = false"
                 >
@@ -108,14 +108,14 @@
                         aria-haspopup="listbox"
                         aria-controls="home-destination-options"
                         :aria-expanded="open.toString()"
-                        @click="open = !open"
+                        @click="open = !open; upward = window.innerHeight - $el.getBoundingClientRect().bottom < 260"
                     >
                         <span class="truncate" x-text="label"></span>
                         <svg class="h-4 w-4 shrink-0 text-slate-400 transition-transform" :class="{ 'rotate-180': open }" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
                             <path stroke-linecap="round" stroke-linejoin="round" d="m6 9 6 6 6-6" />
                         </svg>
                     </button>
-                    <div id="home-destination-options" x-cloak x-show="open" x-transition.origin.top.left class="absolute left-0 top-full z-50 mt-2 max-h-64 w-[min(20rem,calc(100vw-2.5rem))] overflow-y-auto rounded-2xl border border-[#e9e5dc] bg-white p-2 shadow-[0_18px_48px_-18px_rgba(24,59,50,0.28)]" role="listbox" aria-label="Choose a destination">
+                    <div id="home-destination-options" x-cloak x-show="open" x-transition class="absolute left-0 z-50 max-h-64 w-[min(20rem,calc(100vw-2.5rem))] overflow-y-auto rounded-2xl border border-[#e9e5dc] bg-white p-2 shadow-[0_18px_48px_-18px_rgba(24,59,50,0.28)]" :class="upward ? 'bottom-full mb-2' : 'top-full mt-2'" role="listbox" aria-label="Choose a destination">
                         <button type="button" role="option" :aria-selected="value === ''" class="flex w-full items-center rounded-xl px-3 py-2.5 text-left text-sm transition hover:bg-[#f6f3ec] hover:text-[#183b32]" :class="value === '' ? 'bg-[#f6f3ec] font-semibold text-[#183b32]' : 'text-slate-700'" data-value="" data-label="Anywhere in the world" @click="value = $event.currentTarget.dataset.value; label = $event.currentTarget.dataset.label; open = false">
                             Anywhere in the world
                         </button>
@@ -131,7 +131,7 @@
                 </div>
                 <div
                     class="relative z-10 border-t border-slate-100 px-3 py-2 sm:border-l lg:border-t-0"
-                    x-data="{ open: false, value: '', label: 'Show me everything' }"
+                    x-data="{ open: false, upward: false, value: '', label: 'Show me everything' }"
                     @click.outside="open = false"
                     @keydown.escape.window="open = false"
                 >
@@ -144,14 +144,14 @@
                         aria-haspopup="listbox"
                         aria-controls="home-category-options"
                         :aria-expanded="open.toString()"
-                        @click="open = !open"
+                        @click="open = !open; upward = window.innerHeight - $el.getBoundingClientRect().bottom < 260"
                     >
                         <span class="truncate" x-text="label"></span>
                         <svg class="h-4 w-4 shrink-0 text-slate-400 transition-transform" :class="{ 'rotate-180': open }" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
                             <path stroke-linecap="round" stroke-linejoin="round" d="m6 9 6 6 6-6" />
                         </svg>
                     </button>
-                    <div id="home-category-options" x-cloak x-show="open" x-transition.origin.top.left class="absolute left-0 top-full z-50 mt-2 max-h-64 w-[min(20rem,calc(100vw-2.5rem))] overflow-y-auto rounded-2xl border border-[#e9e5dc] bg-white p-2 shadow-[0_18px_48px_-18px_rgba(24,59,50,0.28)]" role="listbox" aria-label="Choose an experience">
+                    <div id="home-category-options" x-cloak x-show="open" x-transition class="absolute left-0 z-50 max-h-64 w-[min(20rem,calc(100vw-2.5rem))] overflow-y-auto rounded-2xl border border-[#e9e5dc] bg-white p-2 shadow-[0_18px_48px_-18px_rgba(24,59,50,0.28)]" :class="upward ? 'bottom-full mb-2' : 'top-full mt-2'" role="listbox" aria-label="Choose an experience">
                         <button type="button" role="option" :aria-selected="value === ''" class="flex w-full items-center rounded-xl px-3 py-2.5 text-left text-sm transition hover:bg-[#f6f3ec] hover:text-[#183b32]" :class="value === '' ? 'bg-[#f6f3ec] font-semibold text-[#183b32]' : 'text-slate-700'" data-value="" data-label="Show me everything" @click="value = $event.currentTarget.dataset.value; label = $event.currentTarget.dataset.label; open = false">
                             Show me everything
                         </button>

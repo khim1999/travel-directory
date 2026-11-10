@@ -9,9 +9,11 @@ use App\Models\Destination;
 use App\Models\Lead;
 use App\Models\Listing;
 use App\Models\Review;
+use App\Mail\ListingLeadReceived;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 
 class ListingController extends Controller
 {
@@ -38,6 +40,10 @@ class ListingController extends Controller
             $query->whereHas('destination', function ($q) use ($request) {
                 $q->where('slug', $request->input('destination'));
             });
+        }
+
+        if ($request->boolean('unclaimed')) {
+            $query->where('is_claimed', false);
         }
 
         // Category Filter
@@ -144,7 +150,11 @@ class ListingController extends Controller
         $validated['listing_id'] = $listing->id;
         $validated['status'] = 'new';
 
-        Lead::create($validated);
+        $lead = $listing->leads()->create($validated);
+
+        if ($listing->email) {
+            Mail::to($listing->email)->send(new ListingLeadReceived($listing, $lead));
+        }
 
         return back()->with('success', 'Your inquiry has been sent directly to ' . $listing->title . '! They will respond to your email shortly.');
     }
@@ -167,15 +177,14 @@ class ListingController extends Controller
 
         Review::create($validated);
 
-        // Recalculate average rating & review count
-        $reviews = $listing->reviews()->get();
-        $avg = $reviews->avg('rating');
+        // Keep the listing summary in sync with its approved review records.
+        $reviews = $listing->reviews();
 
         $listing->update([
-            'rating' => round($avg, 2),
-            'review_count' => $listing->review_count + 1,
+            'rating' => round((float) $reviews->avg('rating'), 2),
+            'review_count' => $reviews->count(),
         ]);
 
-        return back()->with('success', 'Thank you! Your verified review has been published.');
+        return back()->with('success', 'Thank you! Your review has been published.');
     }
 }

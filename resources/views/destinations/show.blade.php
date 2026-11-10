@@ -13,12 +13,12 @@
 
     <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="max-w-3xl">
-            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md text-xs font-semibold text-indigo-300 mb-4">
+            <div class="mb-4 inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-xs font-semibold text-[#f3c6a9] backdrop-blur-md">
                 <span>{{ $destination->country }}</span>
                 <span>&bull;</span>
                 <span>{{ $destination->listings_count }} Verified Listings</span>
             </div>
-            <h1 class="text-3xl sm:text-5xl font-extrabold tracking-tight">Curated Guide to {{ $destination->name }}</h1>
+            <h1 class="font-serif text-4xl font-medium tracking-tight sm:text-6xl">Curated Guide to {{ $destination->name }}</h1>
             <p class="mt-4 text-base sm:text-lg text-slate-300 leading-relaxed">
                 {{ $destination->description }}
             </p>
@@ -33,7 +33,7 @@
             <h2 class="text-xl font-bold text-slate-900">Recommended Places in {{ $destination->name }}</h2>
             <p class="text-xs text-slate-500 mt-0.5">Top-rated accommodations and authentic excursions.</p>
         </div>
-        <a href="{{ route('listings.index', ['destination' => $destination->slug]) }}" class="text-xs font-bold text-indigo-600 hover:underline">
+        <a href="{{ route('listings.index', ['destination' => $destination->slug]) }}" class="text-xs font-bold text-[#c76545] hover:underline">
             Filter all in {{ $destination->name }} &rarr;
         </a>
     </div>
@@ -58,8 +58,8 @@
 
                 <div class="p-5 flex-1 flex flex-col justify-between">
                     <div>
-                        <span class="text-xs font-semibold text-indigo-600">{{ $listing->category->name }}</span>
-                        <h3 class="text-base font-bold text-slate-900 group-hover:text-indigo-600 truncate mt-1">
+                        <span class="text-xs font-semibold text-[#c76545]">{{ $listing->category->name }}</span>
+                        <h3 class="mt-1 truncate text-base font-semibold text-[#183b32] group-hover:text-[#c76545]">
                             <a href="{{ route('listings.show', $listing->slug) }}">{{ $listing->title }}</a>
                         </h3>
                         <p class="text-xs text-slate-500 mt-1 line-clamp-2 leading-relaxed">{{ $listing->tagline }}</p>
@@ -71,7 +71,7 @@
                             <span class="text-xs font-bold text-slate-800">{{ number_format($listing->rating, 2) }}</span>
                             <span class="text-[11px] text-slate-400">({{ $listing->review_count }})</span>
                         </div>
-                        <a href="{{ route('listings.show', $listing->slug) }}" class="text-xs font-bold text-indigo-600 hover:text-indigo-800">
+                        <a href="{{ route('listings.show', $listing->slug) }}" class="text-xs font-bold text-[#183b32] hover:text-[#c76545]">
                             View Stays &rarr;
                         </a>
                     </div>
