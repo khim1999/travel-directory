@@ -1,0 +1,1051 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-slate-50 text-slate-900 antialiased">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>VoyageDirectory — Curated Global Stays, Villas & Adventures</title>
+    <meta name="description" content="Discover verified boutique hotels, private cliffside villas, Michelin-starred gastronomy, and luxury outdoor adventures worldwide with 0% booking markups.">
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        indigo: {
+                            50: '#eef2ff',
+                            100: '#e0e7ff',
+                            500: '#6366f1',
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                            900: '#312e81',
+                            950: '#1e1b4b',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Alpine.js -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        [x-cloak] { display: none !important; }
+    </style>
+
+    <!-- Programmatic SEO JSON-LD Schema -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "VoyageDirectory",
+      "url": "https://voyagedirectory.com",
+      "description": "Curated directory of boutique accommodations, private villas, and guided experiences."
+    }
+    </script>
+</head>
+<body class="min-h-full flex flex-col font-sans text-slate-800 bg-slate-50"
+      x-data="directoryApp()">
+
+    <!-- Top Announcement Bar -->
+    <div class="bg-indigo-900 text-indigo-100 text-xs sm:text-sm py-2 px-4 text-center font-medium">
+        <span>Are you a boutique hotel, villa, or tour operator? </span>
+        <button @click="currentTab = 'pricing'; scrollToTop()" class="underline font-semibold hover:text-white ml-1">
+            Claim your listing & capture direct leads with 0% commission &rarr;
+        </button>
+    </div>
+
+    <!-- Navigation Header -->
+    <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-18 py-3.5">
+                <!-- Brand Logo -->
+                <div class="flex items-center gap-8">
+                    <button @click="currentTab = 'home'; scrollToTop()" class="flex items-center gap-2.5 text-slate-900 group text-left">
+                        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-teal-500 flex items-center justify-center text-white shadow-md shadow-indigo-500/20 group-hover:scale-105 transition-transform">
+                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </div>
+                        <div>
+                            <span class="text-xl font-bold tracking-tight bg-gradient-to-r from-slate-900 to-indigo-900 bg-clip-text text-transparent">VoyageDirectory</span>
+                            <span class="block text-[10px] uppercase font-bold tracking-widest text-indigo-600 -mt-1">Curated Travel Index</span>
+                        </div>
+                    </button>
+
+                    <!-- Desktop Nav Links -->
+                    <nav class="hidden md:flex items-center gap-6 text-sm font-medium text-slate-600">
+                        <button @click="currentTab = 'listings'; scrollToTop()" :class="currentTab === 'listings' ? 'text-indigo-600 font-bold' : 'hover:text-indigo-600'">Explore Listings</button>
+                        <button @click="currentTab = 'destinations'; scrollToTop()" :class="currentTab === 'destinations' ? 'text-indigo-600 font-bold' : 'hover:text-indigo-600'">Destinations</button>
+                        <button @click="currentTab = 'pricing'; scrollToTop()" :class="currentTab === 'pricing' ? 'text-indigo-600 font-bold' : 'hover:text-indigo-600'">For Business / Pricing</button>
+                    </nav>
+                </div>
+
+                <!-- Right Actions -->
+                <div class="hidden md:flex items-center gap-3">
+                    <button @click="filterOnlyUnclaimed(); currentTab = 'listings'; scrollToTop()" class="text-xs font-semibold text-slate-600 hover:text-indigo-600 px-3 py-2">
+                        Claim Existing Profile
+                    </button>
+                    <button @click="currentTab = 'pricing'; scrollToTop()" class="inline-flex items-center justify-center gap-1.5 px-4 py-2 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg shadow-sm hover:shadow transition-all">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+                        </svg>
+                        List Your Business
+                    </button>
+                </div>
+
+                <!-- Mobile Menu Button -->
+                <div class="flex md:hidden items-center">
+                    <button @click="mobileMenuOpen = !mobileMenuOpen" class="p-2 text-slate-600">
+                        <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Mobile Nav -->
+            <div x-show="mobileMenuOpen" x-cloak class="md:hidden py-4 border-t border-slate-100 flex flex-col gap-3">
+                <button @click="currentTab = 'listings'; mobileMenuOpen = false" class="text-left text-sm font-medium text-slate-700 hover:text-indigo-600 py-1">Explore Listings</button>
+                <button @click="currentTab = 'destinations'; mobileMenuOpen = false" class="text-left text-sm font-medium text-slate-700 hover:text-indigo-600 py-1">Destinations</button>
+                <button @click="currentTab = 'pricing'; mobileMenuOpen = false" class="text-left text-sm font-medium text-slate-700 hover:text-indigo-600 py-1">For Business / Pricing</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Global Success Notification -->
+    <div x-show="alertMessage" x-cloak class="bg-emerald-50 border-b border-emerald-200 text-emerald-800 px-4 py-3 text-sm transition-all">
+        <div class="max-w-7xl mx-auto flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                <svg class="w-5 h-5 text-emerald-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                </svg>
+                <span x-text="alertMessage"></span>
+            </div>
+            <button @click="alertMessage = ''" class="text-emerald-700 font-bold ml-4">✕</button>
+        </div>
+    </div>
+
+    <!-- MAIN BODY -->
+    <main class="flex-1">
+
+        <!-- TAB 1: HOMEPAGE -->
+        <div x-show="currentTab === 'home'">
+            <!-- Hero Section -->
+            <div class="relative bg-slate-900 text-white overflow-hidden">
+                <div class="absolute inset-0 z-0">
+                    <img src="https://images.unsplash.com/photo-1506929562872-bb421503ef21?auto=format&fit=crop&w=1920&q=80" 
+                         alt="Scenic coastline backdrop" 
+                         class="w-full h-full object-cover opacity-25 filter blur-[1px]">
+                    <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-900/80 to-transparent"></div>
+                </div>
+
+                <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-24 lg:pt-28 lg:pb-32 text-center">
+                    <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-xs font-semibold text-indigo-300 mb-6">
+                        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                        <span>The Global Directory for Discerning Travelers & Curated Stays</span>
+                    </div>
+
+                    <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight max-w-4xl mx-auto leading-tight">
+                        Discover Secret Stays, Private Villas & <span class="bg-gradient-to-r from-indigo-400 via-teal-300 to-sky-400 bg-clip-text text-transparent">Unforgettable Adventures</span>
+                    </h1>
+
+                    <p class="mt-5 text-base sm:text-lg text-slate-300 max-w-2xl mx-auto leading-relaxed">
+                        Connect directly with verified independent hosts, boutique eco-resorts, and local masters worldwide — with zero booking markups.
+                    </p>
+
+                    <!-- Interactive Hero Search Engine -->
+                    <div class="mt-10 max-w-4xl mx-auto">
+                        <div class="bg-white p-2 sm:p-3 rounded-2xl shadow-2xl border border-slate-100 text-slate-900 grid grid-cols-1 md:grid-cols-4 gap-2 sm:gap-3 text-left">
+                            <div class="px-3 py-2 border-b md:border-b-0 md:border-r border-slate-200">
+                                <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-0.5">Keyword</label>
+                                <input type="text" x-model="searchKeyword" placeholder="e.g. Cliff villa, spa, sushi..." class="w-full text-sm font-medium text-slate-800 placeholder-slate-400 focus:outline-none">
+                            </div>
+
+                            <div class="px-3 py-2 border-b md:border-b-0 md:border-r border-slate-200">
+                                <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-0.5">Destination</label>
+                                <select x-model="selectedDestination" class="w-full text-sm font-medium text-slate-800 bg-transparent focus:outline-none cursor-pointer">
+                                    <option value="">All Destinations</option>
+                                    <template x-for="d in destinations" :key="d.id">
+                                        <option :value="d.name" x-text="d.name + ', ' + d.country"></option>
+                                    </template>
+                                </select>
+                            </div>
+
+                            <div class="px-3 py-2 border-b md:border-b-0 md:border-r border-slate-200">
+                                <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-0.5">Category</label>
+                                <select x-model="selectedCategory" class="w-full text-sm font-medium text-slate-800 bg-transparent focus:outline-none cursor-pointer">
+                                    <option value="">All Categories</option>
+                                    <template x-for="c in categories" :key="c">
+                                        <option :value="c" x-text="c"></option>
+                                    </template>
+                                </select>
+                            </div>
+
+                            <div class="flex items-center">
+                                <button @click="currentTab = 'listings'; scrollToTop()" class="w-full h-full py-3.5 px-6 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm flex items-center justify-center gap-2 shadow-md hover:shadow-lg transition-all">
+                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                    </svg>
+                                    <span>Search Stays</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="mt-4 flex flex-wrap items-center justify-center gap-2 text-xs text-slate-300">
+                            <span class="text-slate-400 font-medium">Trending:</span>
+                            <button @click="searchKeyword = 'Ubud'; currentTab = 'listings'" class="px-2.5 py-1 rounded-full bg-white/10 hover:bg-white/20 transition-colors">Ubud Eco-Resorts</button>
+                            <button @click="selectedDestination = 'Santorini'; currentTab = 'listings'" class="px-2.5 py-1 rounded-full bg-white/10 hover:bg-white/20 transition-colors">Santorini Cave Suites</button>
+                            <button @click="selectedDestination = 'Amalfi Coast'; currentTab = 'listings'" class="px-2.5 py-1 rounded-full bg-white/10 hover:bg-white/20 transition-colors">Amalfi Cliff Villas</button>
+                            <button @click="selectedDestination = 'Kyoto'; currentTab = 'listings'" class="px-2.5 py-1 rounded-full bg-white/10 hover:bg-white/20 transition-colors">Kyoto Traditional Ryokans</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Metrics Strip -->
+                <div class="relative z-10 border-t border-white/10 bg-black/40 backdrop-blur-md">
+                    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5">
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
+                            <div>
+                                <div class="text-2xl font-extrabold text-white">2,500+</div>
+                                <div class="text-xs text-slate-400 font-medium">Curated Travel Listings</div>
+                            </div>
+                            <div>
+                                <div class="text-2xl font-extrabold text-white">100%</div>
+                                <div class="text-xs text-slate-400 font-medium">Direct Host Contact</div>
+                            </div>
+                            <div>
+                                <div class="text-2xl font-extrabold text-white">4.95 ★</div>
+                                <div class="text-xs text-slate-400 font-medium">Average Traveler Rating</div>
+                            </div>
+                            <div>
+                                <div class="text-2xl font-extrabold text-white">0%</div>
+                                <div class="text-xs text-slate-400 font-medium">Booking Commissions</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Curated Destinations Grid -->
+            <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+                <div class="flex flex-col sm:flex-row sm:items-end justify-between mb-8 gap-4">
+                    <div>
+                        <span class="text-xs font-bold uppercase tracking-wider text-indigo-600">Explore By Region</span>
+                        <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight mt-1">Iconic Travel Destinations</h2>
+                        <p class="text-sm text-slate-500 mt-1">Handpicked regions known for peerless hospitality, stunning nature, and culture.</p>
+                    </div>
+                    <button @click="currentTab = 'destinations'; scrollToTop()" class="text-sm font-semibold text-indigo-600 hover:text-indigo-700 flex items-center gap-1">
+                        View all destinations &rarr;
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <template x-for="d in destinations.slice(0, 4)" :key="d.id">
+                        <div @click="selectedDestination = d.name; currentTab = 'listings'; scrollToTop()" class="group relative rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 aspect-[4/5] block cursor-pointer">
+                            <img :src="d.image_url" :alt="d.name" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                            <div class="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/30 to-transparent"></div>
+                            <div class="absolute bottom-0 inset-x-0 p-5 text-white">
+                                <span class="text-xs uppercase font-bold tracking-wider text-indigo-300" x-text="d.country"></span>
+                                <h3 class="text-xl font-bold mt-0.5 group-hover:text-indigo-200 transition-colors" x-text="d.name"></h3>
+                                <p class="text-xs text-slate-300 line-clamp-1 mt-1" x-text="d.tagline"></p>
+                                <div class="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full bg-white/20 backdrop-blur-md">
+                                    <span x-text="d.count + ' curated places'"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+            </section>
+
+            <!-- Spotlight Listings Section -->
+            <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+                <div class="flex flex-col sm:flex-row sm:items-end justify-between mb-8 gap-4">
+                    <div>
+                        <span class="text-xs font-bold uppercase tracking-wider text-indigo-600">Featured Collections</span>
+                        <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight mt-1">Verified Spotlight Stays</h2>
+                    </div>
+                    <button @click="currentTab = 'listings'; scrollToTop()" class="text-sm font-semibold text-indigo-600 hover:text-indigo-700">
+                        View full directory &rarr;
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <template x-for="item in listings.slice(0, 6)" :key="item.id">
+                        <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col group">
+                            <div class="relative aspect-[16/10] overflow-hidden bg-slate-100 cursor-pointer" @click="openListing(item)">
+                                <img :src="item.image_url" :alt="item.title" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                                <div class="absolute top-3 left-3 flex gap-1.5">
+                                    <template x-if="item.is_featured">
+                                        <span class="px-2.5 py-1 rounded-md text-[11px] font-bold bg-amber-500 text-white uppercase tracking-wider">Featured</span>
+                                    </template>
+                                    <template x-if="item.is_verified">
+                                        <span class="px-2.5 py-1 rounded-md text-[11px] font-bold bg-emerald-600 text-white flex items-center gap-1">✓ Verified</span>
+                                    </template>
+                                    <template x-if="!item.is_claimed">
+                                        <span class="px-2.5 py-1 rounded-md text-[11px] font-bold bg-amber-100 text-amber-800 border border-amber-300">Unclaimed</span>
+                                    </template>
+                                </div>
+                                <div class="absolute bottom-3 right-3 px-3 py-1 rounded-lg text-xs font-bold bg-slate-900/85 backdrop-blur-md text-white">
+                                    <span x-text="item.price_level + ' • $' + item.price_avg + '/night'"></span>
+                                </div>
+                            </div>
+
+                            <div class="p-6 flex-1 flex flex-col justify-between">
+                                <div>
+                                    <div class="flex items-center justify-between text-xs text-slate-500 mb-2">
+                                        <span class="font-semibold text-indigo-600" x-text="item.category"></span>
+                                        <span x-text="item.city + ', ' + item.destination"></span>
+                                    </div>
+                                    <h3 class="text-lg font-bold text-slate-900 group-hover:text-indigo-600 cursor-pointer line-clamp-1" @click="openListing(item)" x-text="item.title"></h3>
+                                    <p class="text-xs text-slate-500 mt-1 line-clamp-2 leading-relaxed" x-text="item.tagline"></p>
+                                </div>
+
+                                <div class="pt-5 mt-5 border-t border-slate-100 flex items-center justify-between">
+                                    <div class="flex items-center gap-1.5 text-xs">
+                                        <span class="text-amber-400 font-bold">★ <span x-text="item.rating"></span></span>
+                                        <span class="text-slate-400" x-text="'(' + item.review_count + ')'"></span>
+                                    </div>
+                                    <button @click="openListing(item)" class="text-xs font-bold text-indigo-600 hover:text-indigo-800">
+                                        View Details &rarr;
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+            </section>
+
+            <!-- B2B Owner CTA -->
+            <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+                <div class="relative rounded-3xl bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white p-8 sm:p-12 lg:p-16 overflow-hidden shadow-2xl border border-indigo-900">
+                    <div class="relative z-10 max-w-2xl">
+                        <span class="inline-block px-3 py-1 rounded-full bg-indigo-500/20 text-indigo-300 text-xs font-bold uppercase tracking-wider mb-4 border border-indigo-400/30">
+                            For Travel Business Owners & Hosts
+                        </span>
+                        <h2 class="text-3xl sm:text-4xl font-extrabold tracking-tight leading-tight">
+                            Take Control of Your Bookings. <br><span class="text-teal-300">0% Commissions Forever.</span>
+                        </h2>
+                        <p class="mt-4 text-sm sm:text-base text-slate-300 leading-relaxed">
+                            Tired of losing 18–25% on every booking to OTAs? Claim your existing profile on VoyageDirectory, get verified, and let high-intent travelers contact you directly via phone, WhatsApp, and email.
+                        </p>
+
+                        <div class="mt-8 flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
+                            <button @click="currentTab = 'pricing'; scrollToTop()" class="px-6 py-3.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm text-center shadow-lg transition-all">
+                                View Pro Merchant Plans &rarr;
+                            </button>
+                            <button @click="filterOnlyUnclaimed(); currentTab = 'listings'; scrollToTop()" class="px-6 py-3.5 rounded-xl bg-white/10 hover:bg-white/15 text-white font-semibold text-sm text-center border border-white/20 transition-all">
+                                Search & Claim Existing Listing
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- TAB 2: EXPLORE LISTINGS -->
+        <div x-show="currentTab === 'listings'" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+            <div class="mb-8">
+                <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">Explore Curated Stays & Experiences</h1>
+                <p class="text-sm text-slate-500 mt-1">Discover handpicked boutique accommodations, private villas, and local excursions.</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+                <!-- Filter Sidebar -->
+                <div class="lg:col-span-1">
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm sticky top-24 space-y-5">
+                        <div class="flex items-center justify-between pb-4 border-b border-slate-100">
+                            <h2 class="text-sm font-bold text-slate-900 uppercase tracking-wider">Filters</h2>
+                            <button @click="resetFilters()" class="text-xs text-indigo-600 hover:text-indigo-800 font-semibold">Reset All</button>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 uppercase mb-1.5">Keyword</label>
+                            <input type="text" x-model="searchKeyword" placeholder="Keyword or title..." class="w-full text-xs bg-slate-50 border border-slate-200 rounded-lg px-3 py-2.5 text-slate-800 focus:outline-none focus:border-indigo-500">
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 uppercase mb-1.5">Destination</label>
+                            <select x-model="selectedDestination" class="w-full text-xs bg-slate-50 border border-slate-200 rounded-lg px-3 py-2.5 text-slate-800 focus:outline-none focus:border-indigo-500 cursor-pointer">
+                                <option value="">All Destinations</option>
+                                <template x-for="d in destinations" :key="d.id">
+                                    <option :value="d.name" x-text="d.name + ', ' + d.country"></option>
+                                </template>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 uppercase mb-1.5">Category</label>
+                            <select x-model="selectedCategory" class="w-full text-xs bg-slate-50 border border-slate-200 rounded-lg px-3 py-2.5 text-slate-800 focus:outline-none focus:border-indigo-500 cursor-pointer">
+                                <option value="">All Categories</option>
+                                <template x-for="c in categories" :key="c">
+                                    <option :value="c" x-text="c"></option>
+                                </template>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 uppercase mb-1.5">Price Level</label>
+                            <div class="grid grid-cols-4 gap-2">
+                                <template x-for="p in ['$', '$$', '$$$', '$$$$']" :key="p">
+                                    <button @click="selectedPrice = (selectedPrice === p ? '' : p)" 
+                                            :class="selectedPrice === p ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-slate-50 text-slate-700 border-slate-200'"
+                                            class="border rounded-lg p-2 text-center text-xs font-bold transition-all" x-text="p"></button>
+                                </template>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 uppercase mb-1.5">Claim Status</label>
+                            <label class="flex items-center gap-2 text-xs font-medium text-slate-700 cursor-pointer">
+                                <input type="checkbox" x-model="onlyUnclaimed" class="rounded text-indigo-600 focus:ring-0">
+                                <span>Show Unclaimed Profiles only</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Listings Grid -->
+                <div class="lg:col-span-3">
+                    <div class="flex items-center justify-between pb-4 mb-6 border-b border-slate-200">
+                        <span class="text-xs text-slate-500 font-medium">
+                            Showing <strong class="text-slate-900" x-text="filteredListings.length"></strong> curated places
+                        </span>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <template x-for="item in filteredListings" :key="item.id">
+                            <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col group">
+                                <div class="relative aspect-[16/10] overflow-hidden bg-slate-100 cursor-pointer" @click="openListing(item)">
+                                    <img :src="item.image_url" :alt="item.title" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                                    <div class="absolute top-3 left-3 flex gap-1">
+                                        <template x-if="item.is_featured">
+                                            <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500 text-white uppercase">Featured</span>
+                                        </template>
+                                        <template x-if="item.is_verified">
+                                            <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-600 text-white">Verified</span>
+                                        </template>
+                                        <template x-if="!item.is_claimed">
+                                            <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-300">Unclaimed</span>
+                                        </template>
+                                    </div>
+                                    <div class="absolute bottom-3 right-3 px-2.5 py-1 rounded-lg text-xs font-bold bg-slate-900/80 backdrop-blur-md text-white">
+                                        <span x-text="item.price_level + ' • $' + item.price_avg + '/nt'"></span>
+                                    </div>
+                                </div>
+
+                                <div class="p-5 flex-1 flex flex-col justify-between">
+                                    <div>
+                                        <div class="flex items-center justify-between text-xs text-slate-500 mb-1.5">
+                                            <span class="font-semibold text-indigo-600" x-text="item.category"></span>
+                                            <span x-text="item.destination"></span>
+                                        </div>
+                                        <h3 class="text-base font-bold text-slate-900 group-hover:text-indigo-600 truncate cursor-pointer" @click="openListing(item)" x-text="item.title"></h3>
+                                        <p class="text-xs text-slate-500 mt-1 line-clamp-2 leading-relaxed" x-text="item.tagline"></p>
+                                    </div>
+
+                                    <div class="pt-4 mt-4 border-t border-slate-100 flex items-center justify-between">
+                                        <div class="flex items-center gap-1 text-xs">
+                                            <span class="text-amber-500 font-bold">★ <span x-text="item.rating"></span></span>
+                                            <span class="text-slate-400" x-text="'(' + item.review_count + ')'"></span>
+                                        </div>
+                                        <button @click="openListing(item)" class="text-xs font-bold text-indigo-600 hover:text-indigo-800">
+                                            View Stays &rarr;
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 3: DESTINATIONS -->
+        <div x-show="currentTab === 'destinations'" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <div class="text-center max-w-3xl mx-auto mb-12">
+                <span class="text-xs font-bold uppercase tracking-wider text-indigo-600">Curated Global Index</span>
+                <h1 class="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight mt-1">Explore by Destination</h1>
+                <p class="text-sm sm:text-base text-slate-500 mt-2">
+                    Browse our handpicked collection of destinations known for unparalleled landscape beauty, boutique architecture, and rich local culture.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                <template x-for="d in destinations" :key="d.id">
+                    <div @click="selectedDestination = d.name; currentTab = 'listings'; scrollToTop()" class="group relative rounded-3xl overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-300 aspect-[4/3] block bg-slate-900 cursor-pointer">
+                        <img :src="d.image_url" :alt="d.name" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-90">
+                        <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent"></div>
+                        <div class="absolute bottom-0 inset-x-0 p-6 text-white">
+                            <span class="text-xs font-bold uppercase tracking-wider text-indigo-300" x-text="d.country"></span>
+                            <h2 class="text-2xl font-bold mt-1 group-hover:text-indigo-200 transition-colors" x-text="d.name"></h2>
+                            <p class="text-xs text-slate-300 line-clamp-2 mt-1.5 leading-relaxed" x-text="d.tagline"></p>
+                            <div class="mt-4 flex items-center justify-between text-xs font-semibold">
+                                <span class="px-3 py-1 rounded-full bg-white/20 backdrop-blur-md" x-text="d.count + ' curated places'"></span>
+                                <span class="text-indigo-300 group-hover:translate-x-1 transition-transform flex items-center gap-1">Explore guides &rarr;</span>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+            </div>
+        </div>
+
+        <!-- TAB 4: PRICING & MONETIZATION -->
+        <div x-show="currentTab === 'pricing'" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+            <div class="text-center max-w-3xl mx-auto mb-16">
+                <span class="inline-block px-3 py-1 rounded-full bg-indigo-50 border border-indigo-200 text-indigo-700 text-xs font-bold uppercase tracking-wider mb-4">
+                    For Boutique Hotels, Villas, Tour Operators & Restaurants
+                </span>
+                <h1 class="text-4xl sm:text-5xl font-extrabold text-slate-900 tracking-tight leading-tight">
+                    Stop Paying 20% OTA Fees. <br><span class="text-indigo-600">Own Your Direct Guest Relationships.</span>
+                </h1>
+                <p class="text-base sm:text-lg text-slate-600 mt-4 leading-relaxed">
+                    VoyageDirectory puts travelers directly in touch with you. When guests book through our platform, you keep 100% of the revenue.
+                </p>
+            </div>
+
+            <!-- 3 Pricing Cards -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-stretch mb-20">
+                <!-- Free Plan -->
+                <div class="bg-white rounded-3xl border border-slate-200 p-8 flex flex-col justify-between shadow-sm">
+                    <div>
+                        <h3 class="text-xl font-bold text-slate-900">Claim & Basic</h3>
+                        <p class="text-xs text-slate-500 mt-2 min-h-[36px]">For individual guides and operators claiming their basic public directory profile.</p>
+                        <div class="mt-6 pb-6 border-b border-slate-100">
+                            <div class="flex items-baseline gap-1">
+                                <span class="text-4xl font-extrabold text-slate-900">$0</span>
+                                <span class="text-xs font-medium text-slate-500">/ Forever Free</span>
+                            </div>
+                            <span class="text-[11px] text-slate-400 font-medium mt-1 block">No credit card required</span>
+                        </div>
+                        <ul class="mt-6 space-y-3.5 text-xs text-slate-700">
+                            <li class="flex items-center gap-2">✓ Claim your business profile</li>
+                            <li class="flex items-center gap-2">✓ Update opening hours & contact details</li>
+                            <li class="flex items-center gap-2">✓ Standard directory search indexing</li>
+                            <li class="flex items-center gap-2">✓ Respond to customer reviews</li>
+                        </ul>
+                    </div>
+                    <div class="mt-8 pt-6 border-t border-slate-100">
+                        <button @click="filterOnlyUnclaimed(); currentTab = 'listings'; scrollToTop()" class="w-full py-3 px-4 rounded-xl text-center text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-900 transition-all">
+                            Claim Free Profile &rarr;
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Pro Merchant Plan ($39/mo) -->
+                <div class="bg-white rounded-3xl border border-indigo-600 ring-2 ring-indigo-600/20 shadow-xl p-8 flex flex-col justify-between relative">
+                    <div class="absolute -top-3.5 left-1/2 -translate-x-1/2 px-3.5 py-1 rounded-full bg-indigo-600 text-white text-[11px] font-bold uppercase tracking-wider shadow">
+                        Most Popular for High ROI
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-bold text-slate-900">Pro Merchant Growth</h3>
+                        <p class="text-xs text-slate-500 mt-2 min-h-[36px]">For verified boutique hotels, villa owners, and restaurants wanting direct leads.</p>
+                        <div class="mt-6 pb-6 border-b border-slate-100">
+                            <div class="flex items-baseline gap-1">
+                                <span class="text-4xl font-extrabold text-slate-900">$39</span>
+                                <span class="text-xs font-medium text-slate-500">/ per month</span>
+                            </div>
+                            <span class="text-[11px] text-emerald-600 font-semibold mt-1 block">Billed monthly • Cancel anytime</span>
+                        </div>
+                        <ul class="mt-6 space-y-3.5 text-xs text-slate-700">
+                            <li class="flex items-center gap-2 font-semibold text-indigo-900">✓ Verified Gold Trust Badge</li>
+                            <li class="flex items-center gap-2 font-semibold text-indigo-900">✓ Direct traveler lead capture form</li>
+                            <li class="flex items-center gap-2">✓ Do-Follow SEO backlink to your site</li>
+                            <li class="flex items-center gap-2">✓ Priority category search placement</li>
+                            <li class="flex items-center gap-2">✓ Zero booking commissions</li>
+                        </ul>
+                    </div>
+                    <div class="mt-8 pt-6 border-t border-slate-100">
+                        <button @click="alertMessage = 'Pro Merchant Trial activated! Our merchant team will reach out to connect Stripe billing.'" class="w-full py-3 px-4 rounded-xl text-center text-xs font-bold bg-indigo-600 hover:bg-indigo-700 text-white shadow-md transition-all">
+                            Start 14-Day Free Trial &rarr;
+                        </button>
+                    </div>
+                </div>
+
+                <!-- VIP Destination Partner ($89/mo) -->
+                <div class="bg-white rounded-3xl border border-slate-200 p-8 flex flex-col justify-between shadow-sm">
+                    <div>
+                        <h3 class="text-xl font-bold text-slate-900">VIP Destination Partner</h3>
+                        <p class="text-xs text-slate-500 mt-2 min-h-[36px]">For premier luxury resorts, private jet/yacht charters, and iconic attractions.</p>
+                        <div class="mt-6 pb-6 border-b border-slate-100">
+                            <div class="flex items-baseline gap-1">
+                                <span class="text-4xl font-extrabold text-slate-900">$89</span>
+                                <span class="text-xs font-medium text-slate-500">/ per month</span>
+                            </div>
+                            <span class="text-[11px] text-emerald-600 font-semibold mt-1 block">Billed monthly • Dedicated Support</span>
+                        </div>
+                        <ul class="mt-6 space-y-3.5 text-xs text-slate-700">
+                            <li class="flex items-center gap-2">✓ Everything in Pro Merchant</li>
+                            <li class="flex items-center gap-2 font-semibold text-indigo-900">✓ Top-of-Category Sticky Spotlight</li>
+                            <li class="flex items-center gap-2 font-semibold text-indigo-900">✓ Homepage Featured Section slot</li>
+                            <li class="flex items-center gap-2">✓ Monthly newsletter spotlight feature</li>
+                            <li class="flex items-center gap-2">✓ Dedicated concierge manager</li>
+                        </ul>
+                    </div>
+                    <div class="mt-8 pt-6 border-t border-slate-100">
+                        <button @click="alertMessage = 'Thank you! A dedicated partner concierge will contact you within 2 hours.'" class="w-full py-3 px-4 rounded-xl text-center text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-900 transition-all">
+                            Become a VIP Partner &rarr;
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ROI Stats Strip -->
+            <div class="bg-gradient-to-br from-slate-900 to-indigo-950 text-white rounded-3xl p-8 sm:p-12 mb-20 shadow-xl border border-indigo-900">
+                <div class="max-w-3xl">
+                    <span class="text-xs font-bold uppercase tracking-wider text-teal-400">The Business Economics</span>
+                    <h2 class="text-2xl sm:text-3xl font-extrabold mt-1">Why Travel Businesses Love VoyageDirectory</h2>
+                    <p class="text-sm text-slate-300 mt-3 leading-relaxed">
+                        If a typical boutique villa generates 1 direct 4-night stay ($2,400 value) each month via VoyageDirectory instead of Airbnb or Booking.com, you save <strong>$432/month in commissions</strong> while paying just $39/mo. That is an immediate <strong>1,100% ROI</strong>.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- DETAIL MODAL VIEW (Rich Listing Profile) -->
+    <div x-show="activeListing" x-cloak class="fixed inset-0 z-50 overflow-y-auto" role="dialog">
+        <div class="flex items-center justify-center min-h-screen px-4 py-8 text-center sm:p-0">
+            <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs transition-opacity" @click="activeListing = null"></div>
+
+            <div class="relative bg-white rounded-3xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:max-w-4xl sm:w-full p-6 sm:p-8">
+                <!-- Close Button -->
+                <button @click="activeListing = null" class="absolute top-5 right-5 text-slate-400 hover:text-slate-600 text-lg font-bold z-20">✕</button>
+
+                <template x-if="activeListing">
+                    <div>
+                        <!-- Unclaimed Banner -->
+                        <template x-if="!activeListing.is_claimed">
+                            <div class="mb-6 p-4 rounded-2xl bg-amber-50 border border-amber-200 flex items-center justify-between gap-4">
+                                <div class="text-xs text-amber-900">
+                                    <strong>Are you the owner of this property?</strong> Claim this listing to activate verified status and direct lead inquiries.
+                                </div>
+                                <button @click="claimTarget = activeListing; claimModalOpen = true" class="px-4 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold shrink-0">
+                                    Claim Now &rarr;
+                                </button>
+                            </div>
+                        </template>
+
+                        <!-- Title Header -->
+                        <div class="flex flex-col sm:flex-row sm:items-start justify-between pb-6 border-b border-slate-200 gap-4">
+                            <div>
+                                <div class="flex items-center gap-2 mb-2">
+                                    <span class="px-2.5 py-0.5 rounded text-xs font-semibold bg-indigo-50 text-indigo-700" x-text="activeListing.category"></span>
+                                    <template x-if="activeListing.is_verified">
+                                        <span class="px-2.5 py-0.5 rounded text-xs font-semibold bg-emerald-50 text-emerald-700">✓ Verified Host</span>
+                                    </template>
+                                </div>
+                                <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900" x-text="activeListing.title"></h2>
+                                <p class="text-xs text-slate-500 mt-1" x-text="activeListing.address + ' • ' + activeListing.city + ', ' + activeListing.destination"></p>
+                            </div>
+                            <div class="text-right shrink-0">
+                                <div class="text-2xl font-extrabold text-slate-900" x-text="'$' + activeListing.price_avg + ' / night'"></div>
+                                <span class="text-xs text-slate-400" x-text="'Price tier: ' + activeListing.price_level"></span>
+                            </div>
+                        </div>
+
+                        <!-- Image & Details Grid -->
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 my-6">
+                            <div class="md:col-span-2 aspect-[16/10] rounded-2xl overflow-hidden bg-slate-100">
+                                <img :src="activeListing.image_url" :alt="activeListing.title" class="w-full h-full object-cover">
+                            </div>
+                            <div class="bg-slate-50 p-5 rounded-2xl border border-slate-200 flex flex-col justify-between">
+                                <div>
+                                    <span class="text-[10px] font-bold uppercase tracking-wider text-indigo-600">Zero Commissions</span>
+                                    <h4 class="text-sm font-bold text-slate-900 mt-0.5">Direct Booking Inquiry</h4>
+                                    <p class="text-xs text-slate-500 mt-1">Submit your travel dates to receive direct rates from the owner.</p>
+                                </div>
+                                <div class="space-y-2 pt-4">
+                                    <button @click="leadTarget = activeListing; leadModalOpen = true" class="w-full py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow">
+                                        Send Direct Message &rarr;
+                                    </button>
+                                    <template x-if="!activeListing.is_claimed">
+                                        <button @click="claimTarget = activeListing; claimModalOpen = true" class="w-full py-2.5 rounded-xl border border-amber-500 text-amber-700 hover:bg-amber-50 font-bold text-xs">
+                                            Claim This Property
+                                        </button>
+                                    </template>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Description & Amenities -->
+                        <div class="space-y-6">
+                            <div>
+                                <h3 class="text-sm font-bold text-slate-900 mb-2">About this experience</h3>
+                                <p class="text-xs sm:text-sm text-slate-600 leading-relaxed" x-text="activeListing.description"></p>
+                            </div>
+
+                            <div>
+                                <h3 class="text-sm font-bold text-slate-900 mb-3">Included Amenities</h3>
+                                <div class="flex flex-wrap gap-2">
+                                    <template x-for="a in activeListing.amenities" :key="a">
+                                        <span class="px-3 py-1 rounded-lg bg-slate-100 text-xs font-semibold text-slate-800" x-text="'✓ ' + a"></span>
+                                    </template>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+            </div>
+        </div>
+    </div>
+
+    <!-- CLAIM MODAL -->
+    <div x-show="claimModalOpen" x-cloak class="fixed inset-0 z-50 overflow-y-auto">
+        <div class="flex items-center justify-center min-h-screen px-4">
+            <div class="fixed inset-0 bg-slate-900/60" @click="claimModalOpen = false"></div>
+            <div class="relative bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl z-10">
+                <h3 class="text-lg font-bold text-slate-900 mb-1">Claim Business Profile</h3>
+                <p class="text-xs text-slate-500 mb-4">Confirm your identity as owner/manager to unlock direct lead access.</p>
+                <form @submit.prevent="submitClaim()" class="space-y-3">
+                    <input type="text" x-model="claimForm.name" required placeholder="Your Full Name" class="w-full text-xs bg-slate-50 border border-slate-200 rounded-lg p-2.5">
+                    <input type="email" x-model="claimForm.email" required placeholder="Official Business Email" class="w-full text-xs bg-slate-50 border border-slate-200 rounded-lg p-2.5">
+                    <input type="tel" x-model="claimForm.phone" placeholder="Contact Phone / WhatsApp" class="w-full text-xs bg-slate-50 border border-slate-200 rounded-lg p-2.5">
+                    <textarea x-model="claimForm.notes" rows="2" placeholder="Website or verification note..." class="w-full text-xs bg-slate-50 border border-slate-200 rounded-lg p-2.5"></textarea>
+                    <div class="flex justify-end gap-2 pt-2">
+                        <button type="button" @click="claimModalOpen = false" class="px-4 py-2 text-xs font-semibold text-slate-600">Cancel</button>
+                        <button type="submit" class="px-5 py-2.5 rounded-xl bg-amber-600 text-white font-bold text-xs">Submit Claim &rarr;</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- LEAD INQUIRY MODAL -->
+    <div x-show="leadModalOpen" x-cloak class="fixed inset-0 z-50 overflow-y-auto">
+        <div class="flex items-center justify-center min-h-screen px-4">
+            <div class="fixed inset-0 bg-slate-900/60" @click="leadModalOpen = false"></div>
+            <div class="relative bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl z-10">
+                <h3 class="text-lg font-bold text-slate-900 mb-1">Direct Booking Inquiry</h3>
+                <p class="text-xs text-slate-500 mb-4">Send an inquiry directly to the host. No middleman fees.</p>
+                <form @submit.prevent="submitLead()" class="space-y-3">
+                    <input type="text" x-model="leadForm.name" required placeholder="Your Name" class="w-full text-xs bg-slate-50 border border-slate-200 rounded-lg p-2.5">
+                    <input type="email" x-model="leadForm.email" required placeholder="Your Email Address" class="w-full text-xs bg-slate-50 border border-slate-200 rounded-lg p-2.5">
+                    <div class="grid grid-cols-2 gap-2">
+                        <input type="date" x-model="leadForm.date" class="w-full text-xs bg-slate-50 border border-slate-200 rounded-lg p-2.5">
+                        <input type="number" x-model="leadForm.guests" min="1" value="2" placeholder="Guests" class="w-full text-xs bg-slate-50 border border-slate-200 rounded-lg p-2.5">
+                    </div>
+                    <textarea x-model="leadForm.message" required rows="3" placeholder="Inquire about dates, room rates, or special requests..." class="w-full text-xs bg-slate-50 border border-slate-200 rounded-lg p-2.5"></textarea>
+                    <div class="flex justify-end gap-2 pt-2">
+                        <button type="button" @click="leadModalOpen = false" class="px-4 py-2 text-xs font-semibold text-slate-600">Cancel</button>
+                        <button type="submit" class="px-5 py-2.5 rounded-xl bg-indigo-600 text-white font-bold text-xs">Send Inquiry &rarr;</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-slate-900 text-slate-400 text-sm mt-20 border-t border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-10">
+                <div class="space-y-4">
+                    <div class="flex items-center gap-2 text-white">
+                        <span class="text-lg font-bold">VoyageDirectory</span>
+                    </div>
+                    <p class="text-xs text-slate-400 leading-relaxed">
+                        The independent curated travel directory connecting discerning travelers directly with boutique accommodations, villas, private tours, and culinary masterminds.
+                    </p>
+                    <div class="text-xs text-slate-500">&copy; 2026 VoyageDirectory Inc. All rights reserved.</div>
+                </div>
+                <div>
+                    <h4 class="text-xs font-bold uppercase tracking-wider text-slate-200 mb-3">Popular Destinations</h4>
+                    <ul class="space-y-2 text-xs">
+                        <li><button @click="selectedDestination = 'Bali'; currentTab = 'listings'; scrollToTop()" class="hover:text-white">Bali, Indonesia</button></li>
+                        <li><button @click="selectedDestination = 'Santorini'; currentTab = 'listings'; scrollToTop()" class="hover:text-white">Santorini, Greece</button></li>
+                        <li><button @click="selectedDestination = 'Kyoto'; currentTab = 'listings'; scrollToTop()" class="hover:text-white">Kyoto, Japan</button></li>
+                        <li><button @click="selectedDestination = 'Amalfi Coast'; currentTab = 'listings'; scrollToTop()" class="hover:text-white">Amalfi Coast, Italy</button></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-xs font-bold uppercase tracking-wider text-slate-200 mb-3">For Travel Businesses</h4>
+                    <ul class="space-y-2 text-xs">
+                        <li><button @click="currentTab = 'pricing'; scrollToTop()" class="hover:text-white">Claim Business Profile</button></li>
+                        <li><button @click="currentTab = 'pricing'; scrollToTop()" class="hover:text-white">Pro Merchant Pricing</button></li>
+                        <li><button @click="currentTab = 'pricing'; scrollToTop()" class="hover:text-white">Direct Inquiry Pipeline</button></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-xs font-bold uppercase tracking-wider text-slate-200 mb-3">Stay in the Loop</h4>
+                    <p class="text-xs text-slate-400 mb-3">Get our monthly dispatch of secret boutique hideaways.</p>
+                    <input type="email" placeholder="Your email address" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none">
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Alpine Data App Logic -->
+    <script>
+        function directoryApp() {
+            return {
+                currentTab: 'home',
+                mobileMenuOpen: false,
+                activeListing: null,
+                claimModalOpen: false,
+                leadModalOpen: false,
+                alertMessage: '',
+                searchKeyword: '',
+                selectedDestination: '',
+                selectedCategory: '',
+                selectedPrice: '',
+                onlyUnclaimed: false,
+
+                claimTarget: null,
+                claimForm: { name: '', email: '', phone: '', notes: '' },
+
+                leadTarget: null,
+                leadForm: { name: '', email: '', date: '', guests: 2, message: '' },
+
+                destinations: [
+                    { id: 1, name: 'Bali', country: 'Indonesia', tagline: 'Tropical beaches, spiritual temples & terraced rice fields', count: 18, image_url: 'https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=800&q=80' },
+                    { id: 2, name: 'Santorini', country: 'Greece', tagline: 'Whitewashed cliffside villas & iconic Aegean caldera sunsets', count: 24, image_url: 'https://images.unsplash.com/photo-1570077188670-e3a8d69ac5ff?auto=format&fit=crop&w=800&q=80' },
+                    { id: 3, name: 'Kyoto', country: 'Japan', tagline: 'Ancient shrines, zen rock gardens & historic geisha districts', count: 15, image_url: 'https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?auto=format&fit=crop&w=800&q=80' },
+                    { id: 4, name: 'Amalfi Coast', country: 'Italy', tagline: 'Dramatic cliffs, pastel villages & Mediterranean gastronomy', count: 22, image_url: 'https://images.unsplash.com/photo-1533105079780-92b9be482077?auto=format&fit=crop&w=800&q=80' },
+                    { id: 5, name: 'Banff', country: 'Canada', tagline: 'Glacial turquoise lakes & majestic Canadian Rockies', count: 12, image_url: 'https://images.unsplash.com/photo-1503614472-8c93d56e92ce?auto=format&fit=crop&w=800&q=80' },
+                    { id: 6, name: 'Queenstown', country: 'New Zealand', tagline: 'Alpine adventure capital, fjord cruises & boutique vineyards', count: 14, image_url: 'https://images.unsplash.com/photo-1507699622108-4be3abd695ad?auto=format&fit=crop&w=800&q=80' }
+                ],
+
+                categories: [
+                    'Boutique Hotels & Resorts',
+                    'Private Villas & Chalets',
+                    'Fine Dining & Gastronomy',
+                    'Tours & Outdoor Adventures',
+                    'Wellness & Holistic Spas',
+                    'Cultural Workshops & Arts'
+                ],
+
+                listings: [
+                    {
+                        id: 1,
+                        title: 'Mandapa, a Ritz-Carlton Reserve',
+                        category: 'Boutique Hotels & Resorts',
+                        destination: 'Bali',
+                        city: 'Ubud',
+                        address: 'Jl. Raya Kedewatan',
+                        price_level: '$$$$',
+                        price_avg: 850,
+                        rating: 4.95,
+                        review_count: 142,
+                        is_featured: true,
+                        is_verified: true,
+                        is_claimed: true,
+                        tagline: 'Secluded luxury sanctuary along the sacred Ayung River',
+                        description: 'Nestled amidst the lush jungle canopy and rolling hills of Ubud, Mandapa offers an intimate sensory journey. Guests enjoy standalone villas featuring traditional Balinese architecture, personal butler service (Patih), open-air dining pavilions by the river, and bespoke holistic healing rituals.',
+                        image_url: 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=1200&q=80',
+                        amenities: ['High-Speed Wi-Fi', 'Infinity Pool', 'Panoramic View', 'Gourmet Breakfast', 'Holistic Spa', 'AC']
+                    },
+                    {
+                        id: 2,
+                        title: 'Canaves Oia Suites & Spa',
+                        category: 'Boutique Hotels & Resorts',
+                        destination: 'Santorini',
+                        city: 'Santorini',
+                        address: 'Main Street, Oia',
+                        price_level: '$$$$',
+                        price_avg: 920,
+                        rating: 4.98,
+                        review_count: 218,
+                        is_featured: true,
+                        is_verified: true,
+                        is_claimed: true,
+                        tagline: 'Minimalist cave suites carved into the Oia Caldera cliffs',
+                        description: 'Carved into the volcanic cliffs of Oia, Canaves Oia Suites combines traditional Cycladic cliff-architecture with refined ultra-modern minimalism. Each private suite features private plunge pools overlooking the Aegean Sea, gourmet dining, and catamaran excursions.',
+                        image_url: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1200&q=80',
+                        amenities: ['High-Speed Wi-Fi', 'Infinity Pool', 'Panoramic View', 'Gourmet Breakfast', 'Holistic Spa', 'AC']
+                    },
+                    {
+                        id: 3,
+                        title: 'Hoshinoya Kyoto',
+                        category: 'Boutique Hotels & Resorts',
+                        destination: 'Kyoto',
+                        city: 'Kyoto',
+                        address: 'Arashiyama Genrokuzancho',
+                        price_level: '$$$$',
+                        price_avg: 780,
+                        rating: 4.92,
+                        review_count: 97,
+                        is_featured: true,
+                        is_verified: true,
+                        is_claimed: true,
+                        tagline: 'Riverside pavilion retreat accessed only by wooden boat',
+                        description: 'Located along the Oi River in scenic Arashiyama, Hoshinoya is a century-old riverside ryokan restored into a luxury sanctuary. Guests arrive via riverboat, experience seasonal Kaiseki dinners, and morning meditation with Zen monks.',
+                        image_url: 'https://images.unsplash.com/photo-1503899036084-c55cdd92da26?auto=format&fit=crop&w=1200&q=80',
+                        amenities: ['High-Speed Wi-Fi', 'Panoramic View', 'Gourmet Breakfast', 'Airport Chauffeur', 'AC']
+                    },
+                    {
+                        id: 4,
+                        title: 'Ristorante La Sponda',
+                        category: 'Fine Dining & Gastronomy',
+                        destination: 'Amalfi Coast',
+                        city: 'Positano',
+                        address: 'Via Cristoforo Colombo 30',
+                        price_level: '$$$',
+                        price_avg: 160,
+                        rating: 4.88,
+                        review_count: 164,
+                        is_featured: true,
+                        is_verified: true,
+                        is_claimed: true,
+                        tagline: 'Illuminated by 400 candles every evening overlooking Positano',
+                        description: 'Set inside the historic Le Sirenuse hotel in Positano, La Sponda is one of the most romantic dining rooms on earth. Every evening, over 400 candles illuminate vine-draped arches while classical mandolinists serenade diners.',
+                        image_url: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1200&q=80',
+                        amenities: ['Panoramic View', 'High-Speed Wi-Fi', 'AC']
+                    },
+                    {
+                        id: 5,
+                        title: 'Uluwatu Cliffside Sunset Villa',
+                        category: 'Private Villas & Chalets',
+                        destination: 'Bali',
+                        city: 'Uluwatu',
+                        address: 'Jl. Pantai Suluban',
+                        price_level: '$$$',
+                        price_avg: 620,
+                        rating: 4.85,
+                        review_count: 38,
+                        is_featured: false,
+                        is_verified: false,
+                        is_claimed: false, // UNCLAIMED DEMO
+                        tagline: 'Private 4-bedroom cliff villa with cantilevered glass pool',
+                        description: 'Perched 150 meters above the Indian Ocean, this architectural masterpiece features an open-air pavilion, four king suites with ocean panoramas, a private chef, dedicated yoga shala, and sunset views that stretch over the horizon.',
+                        image_url: 'https://images.unsplash.com/photo-1613977257363-707ba9348227?auto=format&fit=crop&w=1200&q=80',
+                        amenities: ['High-Speed Wi-Fi', 'Infinity Pool', 'Panoramic View', 'Pet-Friendly', 'AC']
+                    },
+                    {
+                        id: 6,
+                        title: 'Fairmont Chateau Lake Louise',
+                        category: 'Boutique Hotels & Resorts',
+                        destination: 'Banff',
+                        city: 'Lake Louise',
+                        address: '111 Lake Louise Drive',
+                        price_level: '$$$$',
+                        price_avg: 710,
+                        rating: 4.90,
+                        review_count: 312,
+                        is_featured: true,
+                        is_verified: true,
+                        is_claimed: true,
+                        tagline: 'World-renowned heritage resort on glacial Lake Louise',
+                        description: 'Surrounded by soaring mountain peaks and the majestic Victoria Glacier, this historic Canadian chateau provides four-season alpine adventures including canoeing on emerald waters and fireside fondue dining.',
+                        image_url: 'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=1200&q=80',
+                        amenities: ['High-Speed Wi-Fi', 'Panoramic View', 'Gourmet Breakfast', 'Holistic Spa']
+                    },
+                    {
+                        id: 7,
+                        title: 'Milford Sound Heli-Flight & Glacier Landing',
+                        category: 'Tours & Outdoor Adventures',
+                        destination: 'Queenstown',
+                        city: 'Queenstown',
+                        address: 'Lucas Place, Airport',
+                        price_level: '$$$',
+                        price_avg: 450,
+                        rating: 4.96,
+                        review_count: 84,
+                        is_featured: false,
+                        is_verified: false,
+                        is_claimed: false, // UNCLAIMED DEMO
+                        tagline: 'VIP scenic helicopter tour over Fiordland waterfalls & alpine ice',
+                        description: 'Soar above the awe-inspiring glaciers, dramatic granite spires, and cascading waterfalls of Fiordland National Park. Includes an exclusive landing on an ancient alpine glacier with panoramic champagne toast.',
+                        image_url: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=80',
+                        amenities: ['Panoramic View', 'Airport Chauffeur']
+                    },
+                    {
+                        id: 8,
+                        title: 'Gion Zen Tea & Ceremony Masterclass',
+                        category: 'Cultural Workshops & Arts',
+                        destination: 'Kyoto',
+                        city: 'Kyoto',
+                        address: 'Miyagawacho, Higashiyama',
+                        price_level: '$$',
+                        price_avg: 85,
+                        rating: 4.97,
+                        review_count: 61,
+                        is_featured: false,
+                        is_verified: true,
+                        is_claimed: true,
+                        tagline: 'Authentic chanoyu tea ritual inside a 200-year-old machiya house',
+                        description: 'Step inside an authentic preserved machiya in Gion. Learn the meditative philosophy of Omotesenke tea preparation under the guidance of a 3rd-generation tea master. Includes ceremonial matcha and handmade sweets.',
+                        image_url: 'https://images.unsplash.com/photo-1576092768241-dec231879fc3?auto=format&fit=crop&w=1200&q=80',
+                        amenities: ['High-Speed Wi-Fi', 'AC']
+                    },
+                    {
+                        id: 9,
+                        title: 'Villa TreVille Cliffside Haven',
+                        category: 'Private Villas & Chalets',
+                        destination: 'Amalfi Coast',
+                        city: 'Positano',
+                        address: 'Via Arienzo 30',
+                        price_level: '$$$$',
+                        price_avg: 1250,
+                        rating: 4.99,
+                        review_count: 88,
+                        is_featured: true,
+                        is_verified: true,
+                        is_claimed: true,
+                        tagline: 'Exclusive estate once owned by legendary director Franco Zeffirelli',
+                        description: 'A boutique jewel draped over dramatic cliffs with private sea elevator access, panoramic terraces facing Positano, custom ceramic tile decor, and farm-fresh Mediterranean cuisine.',
+                        image_url: 'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?auto=format&fit=crop&w=1200&q=80',
+                        amenities: ['High-Speed Wi-Fi', 'Infinity Pool', 'Panoramic View', 'Gourmet Breakfast', 'Holistic Spa', 'AC']
+                    }
+                ],
+
+                get filteredListings() {
+                    return this.listings.filter(item => {
+                        const matchKeyword = !this.searchKeyword || 
+                            item.title.toLowerCase().includes(this.searchKeyword.toLowerCase()) ||
+                            item.tagline.toLowerCase().includes(this.searchKeyword.toLowerCase()) ||
+                            item.city.toLowerCase().includes(this.searchKeyword.toLowerCase());
+                        
+                        const matchDestination = !this.selectedDestination || item.destination === this.selectedDestination;
+                        const matchCategory = !this.selectedCategory || item.category === this.selectedCategory;
+                        const matchPrice = !this.selectedPrice || item.price_level === this.selectedPrice;
+                        const matchUnclaimed = !this.onlyUnclaimed || !item.is_claimed;
+
+                        return matchKeyword && matchDestination && matchCategory && matchPrice && matchUnclaimed;
+                    });
+                },
+
+                openListing(item) {
+                    this.activeListing = item;
+                },
+
+                filterOnlyUnclaimed() {
+                    this.resetFilters();
+                    this.onlyUnclaimed = true;
+                },
+
+                resetFilters() {
+                    this.searchKeyword = '';
+                    this.selectedDestination = '';
+                    this.selectedCategory = '';
+                    this.selectedPrice = '';
+                    this.onlyUnclaimed = false;
+                },
+
+                scrollToTop() {
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                },
+
+                submitClaim() {
+                    this.claimModalOpen = false;
+                    this.alertMessage = 'Claim submitted for ' + (this.claimTarget ? this.claimTarget.title : 'this listing') + '! Verification team will reach out within 24 hours.';
+                    this.claimForm = { name: '', email: '', phone: '', notes: '' };
+                },
+
+                submitLead() {
+                    this.leadModalOpen = false;
+                    this.alertMessage = 'Direct inquiry sent directly to ' + (this.leadTarget ? this.leadTarget.title : 'the owner') + '! Check your inbox for their direct confirmation.';
+                    this.leadForm = { name: '', email: '', date: '', guests: 2, message: '' };
+                }
+            };
+        }
+    </script>
+</body>
+</html>
